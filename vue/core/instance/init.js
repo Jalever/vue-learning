@@ -21,9 +21,9 @@ export function initMixin (Vue: Class<Component>) {
     let startTag, endTag;
     /* istanbul ignore if */
     if (process.env.NODE_ENV !== 'production' && config.performance && mark) {
-      startTag = `vue-perf-start:${vm._uid}`
-      endTag = `vue-perf-end:${vm._uid}`
-      mark(startTag)
+      startTag = `vue-perf-start:${vm._uid}`;
+      endTag = `vue-perf-end:${vm._uid}`;
+      mark(startTag);
     }
 
     // a flag to avoid this being observed
@@ -51,14 +51,30 @@ export function initMixin (Vue: Class<Component>) {
     }
 
     // expose real self
-    vm._self = vm;//合并配置
-    initLifecycle(vm);//初始化生命周期
-    initEvents(vm);//初始化事件中心
-    initRender(vm;//初始化渲染
-    callHook(vm, 'beforeCreate');//调用 beforeCreate 钩子函数;
-    initInjections(vm); // resolve injections before data/props;init injections and reactivity（这个阶段属性都已注入绑定，而且被 $watch 变成reactivity，但是 $el 还是没有生成，也就是DOM没有生成）
-    initState(vm);//初始化生命周期;初始化state状态（初始化了data、props、computed、watcher）
+    //合并配置
+    vm._self = vm;
+
+    //初始化生命周期
+    initLifecycle(vm);
+
+    //初始化事件中心
+    initEvents(vm);
+
+    //初始化渲染
+    initRender(vm);
+    
+    //调用 beforeCreate 钩子函数;
+    callHook(vm, 'beforeCreate');
+
+    // resolve injections before data/props;init injections and reactivity
+    // （这个阶段属性都已注入绑定，而且被 $watch 变成reactivity，但是 $el 还是没有生成，也就是DOM没有生成）
+    initInjections(vm); 
+    
+    //初始化生命周期;初始化state状态（初始化了data、props、computed、watcher）
+    initState(vm);
+    
     initProvide(vm); // resolve provide after data/props
+    
     callHook(vm, 'created');//初始化生命周期;调用created钩子函数
 
     /* istanbul ignore if */
