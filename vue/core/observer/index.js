@@ -113,7 +113,8 @@ export function observe(value: any, asRootData: ?boolean): Observer | void {
   }
 
   let ob: Observer | void;
-
+  
+  // Vue的响应式数据都会有一个__ob__的属性作为标记，里面存放了该属性的观察器，也就是Observer的实例，防止重复绑定
   if (hasOwn(value, "__ob__") && value.__ob__ instanceof Observer) {
     ob = value.__ob__;
   } else if (
@@ -124,12 +125,13 @@ export function observe(value: any, asRootData: ?boolean): Observer | void {
     !value._isVue
   ) {
     ob = new Observer(value);
-  };
+  }
 
+  /*如果是根数据则计数，后面Observer中的observe的asRootData非true*/
   if (asRootData && ob) {
     ob.vmCount++;
   }
-  
+
   return ob;
 }
 

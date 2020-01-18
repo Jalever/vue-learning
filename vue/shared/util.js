@@ -120,14 +120,10 @@ export function makeMap(
  */
 export const isBuiltInTag = makeMap("slot,component", true);
 
-/**
- * Check if an attribute is a reserved attribute.
- */
+// Check if an attribute is a reserved attribute.
 export const isReservedAttribute = makeMap("key,ref,slot,slot-scope,is");
 
-/**
- * Remove an item from an array.
- */
+// Remove an item from an array.
 export function remove(arr: Array<any>, item: any): Array<any> | void {
   if (arr.length) {
     const index = arr.indexOf(item);
@@ -137,17 +133,13 @@ export function remove(arr: Array<any>, item: any): Array<any> | void {
   }
 }
 
-/**
- * Check whether an object has the property.
- */
+// Check whether an object has the property
 const hasOwnProperty = Object.prototype.hasOwnProperty;
 export function hasOwn(obj: Object | Array<*>, key: string): boolean {
   return hasOwnProperty.call(obj, key);
 }
 
-/**
- * Create a cached version of a pure function.
- */
+// Create a cached version of a pure function.
 export function cached<F: Function>(fn: F): F {
   const cache = Object.create(null);
   return (function cachedFn(str: string) {
@@ -156,9 +148,7 @@ export function cached<F: Function>(fn: F): F {
   }: any);
 }
 
-/**
- * Camelize a hyphen-delimited string.
- */
+// Camelize a hyphen-delimited string.
 const camelizeRE = /-(\w)/g;
 export const camelize = cached((str: string): string => {
   return str.replace(camelizeRE, (_, c) => (c ? c.toUpperCase() : ""));
@@ -231,9 +221,7 @@ export function extend(to: Object, _from: ?Object): Object {
   return to;
 }
 
-/**
- * Merge an Array of Objects into a single Object.
- */
+// Merge an Array of Objects into a single Object
 export function toObject(arr: Array<any>): Object {
   const res = {};
   for (let i = 0; i < arr.length; i++) {

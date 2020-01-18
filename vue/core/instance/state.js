@@ -1,5 +1,3 @@
-/* @flow */
-
 import config from "../config";
 import Watcher from "../observer/watcher";
 import Dep, { pushTarget, popTarget } from "../observer/dep";
@@ -19,7 +17,7 @@ import {
   noop,
   hasOwn,
   hyphenate,
-  isReserved,
+  isReserved,//Check if a string starts with $ or _
   handleError,
   nativeWatch,
   validateProp,
@@ -39,9 +37,11 @@ export function proxy(target: Object, sourceKey: string, key: string) {
   sharedPropertyDefinition.get = function proxyGetter() {
     return this[sourceKey][key];
   };
+
   sharedPropertyDefinition.set = function proxySetter(val) {
     this[sourceKey][key] = val;
   };
+
   Object.defineProperty(target, key, sharedPropertyDefinition);
 }
 
@@ -112,6 +112,7 @@ function initProps(vm: Component, propsOptions: Object) {
     } else {
       defineReactive(props, key, value);
     }
+
     // static props are already proxied on the component's prototype
     // during Vue.extend(). We only need to proxy props defined at
     // instantiation here.
@@ -119,6 +120,7 @@ function initProps(vm: Component, propsOptions: Object) {
       proxy(vm, `_props`, key);
     }
   }
+  
   toggleObserving(true);
 }
 
@@ -128,6 +130,7 @@ function initData(vm: Component) {
   let data = vm.$options.data;
 
   //operator precedence: ( || ) > ( ... ? ... : ... )
+  //vm._data:undefined的情况下返回“{}”；字符串情况下返回“data”;函数情况下返回getData(data, vm)
   data = vm._data = typeof data === "function" ? getData(data, vm) : data || {};
 
   //是否是对象
@@ -149,6 +152,8 @@ function initData(vm: Component) {
 
   while (i--) {
     const key = keys[i];
+    
+    // methods中是否已经定义了该key值
     if (process.env.NODE_ENV !== "production") {
       if (methods && hasOwn(methods, key)) {
         warn(
@@ -165,6 +170,8 @@ function initData(vm: Component) {
             `Use prop default value instead.`,
           vm
         );
+        
+        //isReserved: Check if a string starts with $ or _
     } else if (!isReserved(key)) {
       proxy(vm, `_data`, key);
     }
