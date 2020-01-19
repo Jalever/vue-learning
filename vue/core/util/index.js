@@ -19,6 +19,8 @@ export * from 'shared/util';
  * ## ./lang
  * isReserved:
  *      Check if a string starts with $ or _
+ * Def
+ *      Define a property
  * 
  */
 export * from './lang';

@@ -2,12 +2,12 @@
 
 import Dep from "./dep";
 import VNode from "../vdom/vnode";
-import { arrayMethods } from "./array";
+import { arrayMethods } from "./array"; // inherit all the prototype Array properties
 import {
-  def,
+  def, // Define a property: data descriptor
   warn,
   hasOwn,
-  hasProto,
+  hasProto, //can we use __proto__?
   isObject,
   isPlainObject,
   isPrimitive,
@@ -43,24 +43,37 @@ export class Observer {
     this.value = value;
     this.dep = new Dep();
     this.vmCount = 0;
+
+    // 将Observer实例绑定到data的__ob__属性上面去，之前说过observe的时候会先检测是否已经有__ob__对象存放Observer实例了
     def(value, "__ob__", this);
+
+    /**
+     * 在将数组处理成响应式数据后，如果使用数组原始方法改变数组时，数组值会发生变化，
+     * 但是并不会触发数组的setter来通知所有依赖该数组的地方进行更新，
+     * 为此，vue通过重写数组的某些方法来监听数组变化，
+     * 重写后的方法中会手动触发通知该数组的所有依赖进行更新
+     * 
+     * 当为数组时，如果浏览器支持__proto__，则直接将当前数据的原型__proto__指向重写后的数组方法对象arrayMethods，
+     * 如果浏览器不支持__proto__，则直接将arrayMethods上重写的方法直接定义到当前数据对象上；
+     * 当数据类型为非数组时，继续递归执行数据的监听
+     */
     if (Array.isArray(value)) {
       if (hasProto) {
-        protoAugment(value, arrayMethods);
+        //arrayMethods: inherit all the prototype Array properties
+        protoAugment(value, arrayMethods); // 直接覆盖原型的方法来修改目标对象
       } else {
-        copyAugment(value, arrayMethods, arrayKeys);
+        copyAugment(value, arrayMethods, arrayKeys); // 定义（覆盖）目标对象或数组的某一个方法
       }
+
+      //如果是数组则需要遍历数组的每一个成员进行observe
       this.observeArray(value);
     } else {
       this.walk(value);
     }
   }
 
-  /**
-   * Walk through all properties and convert them into
-   * getter/setters. This method should only be called when
-   * value type is Object.
-   */
+  // Walk through all properties and convert them into getter/setters.
+  // This method should only be called when value type is Object.
   walk(obj: Object) {
     const keys = Object.keys(obj);
     for (let i = 0; i < keys.length; i++) {
@@ -68,9 +81,7 @@ export class Observer {
     }
   }
 
-  /**
-   * Observe a list of Array items.
-   */
+  //Observe a list of Array items.
   observeArray(items: Array<any>) {
     for (let i = 0, l = items.length; i < l; i++) {
       observe(items[i]);
@@ -80,21 +91,12 @@ export class Observer {
 
 // helpers
 
-/**
- * Augment a target Object or Array by intercepting
- * the prototype chain using __proto__
- */
+//Augment a target Object or Array by intercepting the prototype chain using __proto__
 function protoAugment(target, src: Object) {
-  /* eslint-disable no-proto */
   target.__proto__ = src;
-  /* eslint-enable no-proto */
 }
 
-/**
- * Augment a target Object or Array by defining
- * hidden properties.
- */
-/* istanbul ignore next */
+// Augment a target Object or Array by defining hidden properties
 function copyAugment(target: Object, src: Object, keys: Array<string>) {
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i];
@@ -102,28 +104,30 @@ function copyAugment(target: Object, src: Object, keys: Array<string>) {
   }
 }
 
-/**
- * Attempt to create an observer instance for a value,
- * returns the new observer if successfully observed,
- * or the existing observer if the value already has one.
- */
+// Attempt to create an observer instance for a value,
+// returns the new observer if successfully observed,
+// or the existing observer if the value already has one.
 export function observe(value: any, asRootData: ?boolean): Observer | void {
   if (!isObject(value) || value instanceof VNode) {
     return;
   }
 
   let ob: Observer | void;
-  
-  // Vue的响应式数据都会有一个__ob__的属性作为标记，里面存放了该属性的观察器，也就是Observer的实例，防止重复绑定
-  if (hasOwn(value, "__ob__") && value.__ob__ instanceof Observer) {
-    ob = value.__ob__;
-  } else if (
+
+  // 这里的判断是为了确保value是单纯的对象，而不是函数或者是Regexp等情况
+  let status =
     shouldObserve &&
     !isServerRendering() &&
     (Array.isArray(value) || isPlainObject(value)) &&
     Object.isExtensible(value) &&
-    !value._isVue
-  ) {
+    !value._isVue;
+
+  // Vue的响应式数据都会有一个__ob__的属性作为标记，里面存放了该属性的观察器，也就是Observer的实例，防止重复绑定;
+  // 这里用__ob__这个属性来判断是否已经有Observer实例，
+  // 如果没有Observer实例则会新建一个Observer实例并赋值给__ob__这个属性，如果已有Observer实例则直接返回该Observer实例
+  if (hasOwn(value, "__ob__") && value.__ob__ instanceof Observer) {
+    ob = value.__ob__;
+  } else if (status) {
     ob = new Observer(value);
   }
 
