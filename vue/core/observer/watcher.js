@@ -1,5 +1,4 @@
 /* @flow */
-
 import {
   warn,
   remove,
@@ -34,7 +33,6 @@ let uid = 0;
  * A watcher parses an expression, collects dependencies,
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
- *
  */
 export default class Watcher {
   vm: Component;
@@ -62,12 +60,14 @@ export default class Watcher {
     options?: ?Object,
     isRenderWatcher?: boolean
   ) {
+
     this.vm = vm;
 
     if (isRenderWatcher) {
       vm._watcher = this;
     }
 
+    //_watchers存放订阅者实例
     vm._watchers.push(this);
 
     // options
@@ -94,9 +94,13 @@ export default class Watcher {
 
     // parse expression for getter
     if (typeof expOrFn === "function") {
+
       this.getter = expOrFn;
+
     } else {
+
       this.getter = parsePath(expOrFn);
+
       if (!this.getter) {
         this.getter = noop;
         process.env.NODE_ENV !== "production" &&
@@ -107,6 +111,7 @@ export default class Watcher {
             vm
           );
       }
+      
     }
 
     this.value = this.lazy ? undefined : this.get();
@@ -216,7 +221,6 @@ export default class Watcher {
         this.value = value;
         if (this.user) {
           try {
-
             // 触发渲染操作进行依赖收集
             this.cb.call(this.vm, value, oldValue);
           } catch (e) {

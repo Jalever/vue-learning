@@ -17,9 +17,7 @@ const methodsToPatch = [
   "reverse"
 ];
 
-/**
- * Intercept mutating methods and emit events
- */
+// Intercept mutating methods and emit events
 methodsToPatch.forEach(function(method) {
   // cache original method
   const original = arrayProto[method];
@@ -27,6 +25,7 @@ methodsToPatch.forEach(function(method) {
     const result = original.apply(this, args);
     const ob = this.__ob__;
     let inserted;
+
     switch (method) {
       case "push":
       case "unshift":
@@ -36,7 +35,9 @@ methodsToPatch.forEach(function(method) {
         inserted = args.slice(2);
         break;
     }
+    
     if (inserted) ob.observeArray(inserted);
+
     // notify change
     ob.dep.notify();
     return result;

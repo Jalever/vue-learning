@@ -42,9 +42,7 @@ export function isObject(obj: mixed): boolean %checks {
   return obj !== null && typeof obj === "object";
 }
 
-/**
- * Get the raw type string of a value, e.g., [object Object].
- */
+// Get the raw type string of a value, e.g., [object Object]
 const _toString = Object.prototype.toString;
 
 export function toRawType(value: any): string {
@@ -99,25 +97,24 @@ export function toNumber(val: string): number | string {
   return isNaN(n) ? val : n;
 }
 
-/**
- * Make a map and return a function for checking if a key
- * is in that map.
- */
+//柯里化( 参与者模式 )
+// Make a map and return a function for checking if a key is in that map.
 export function makeMap(
   str: string,
   expectsLowerCase?: boolean
 ): (key: string) => true | void {
+
   const map = Object.create(null);
   const list: Array<string> = str.split(",");
+
   for (let i = 0; i < list.length; i++) {
     map[list[i]] = true;
   }
+
   return expectsLowerCase ? val => map[val.toLowerCase()] : val => map[val];
 }
 
-/**
- * Check if a tag is a built-in tag.
- */
+//Check if a tag is a built-in tag
 export const isBuiltInTag = makeMap("slot,component", true);
 
 // Check if an attribute is a reserved attribute.

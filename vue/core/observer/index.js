@@ -1,5 +1,4 @@
 /* @flow */
-
 import Dep from "./dep";
 import VNode from "../vdom/vnode";
 import { arrayMethods } from "./array"; // inherit all the prototype Array properties
