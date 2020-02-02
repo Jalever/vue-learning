@@ -1,6 +1,6 @@
 /* @flow */
 
-import type Watcher from "./watcher";
+import Watcher from "./watcher";
 import config from "../config";
 import { callHook, activateChildComponent } from "../instance/lifecycle";
 
@@ -87,9 +87,11 @@ function flushSchedulerQueue() {
     if (watcher.before) {
       watcher.before();
     }
+
     id = watcher.id;
     has[id] = null;
     watcher.run();
+
     // in dev build, check and stop circular updates.
     if (process.env.NODE_ENV !== "production" && has[id] != null) {
       circular[id] = (circular[id] || 0) + 1;

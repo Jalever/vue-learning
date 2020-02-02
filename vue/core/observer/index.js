@@ -43,7 +43,8 @@ export class Observer {
     this.dep = new Dep();
     this.vmCount = 0;
 
-    // 将Observer实例绑定到data的__ob__属性上面去，之前说过observe的时候会先检测是否已经有__ob__对象存放Observer实例了
+    // 将Observer实例绑定到data的__ob__属性上面去，
+    // 之前说过observe的时候会先检测是否已经有__ob__对象存放Observer实例了
     def(value, "__ob__", this);
 
     /**
@@ -51,7 +52,7 @@ export class Observer {
      * 但是并不会触发数组的setter来通知所有依赖该数组的地方进行更新，
      * 为此，vue通过重写数组的某些方法来监听数组变化，
      * 重写后的方法中会手动触发通知该数组的所有依赖进行更新
-     * 
+     *
      * 当为数组时，如果浏览器支持__proto__，则直接将当前数据的原型__proto__指向重写后的数组方法对象arrayMethods，
      * 如果浏览器不支持__proto__，则直接将arrayMethods上重写的方法直接定义到当前数据对象上；
      * 当数据类型为非数组时，继续递归执行数据的监听
@@ -61,12 +62,14 @@ export class Observer {
         //arrayMethods: inherit all the prototype Array properties
         protoAugment(value, arrayMethods); // 直接覆盖原型的方法来修改目标对象
       } else {
-        copyAugment(value, arrayMethods, arrayKeys); // 定义（覆盖）目标对象或数组的某一个方法
+        copyAugment(value, arrayMethods, arrayKeys); 
+        // 定义（覆盖）目标对象或数组的某一个方法
       }
 
       //如果是数组则需要遍历数组的每一个成员进行observe
       this.observeArray(value);
     } else {
+      /*如果是对象则直接walk进行绑定*/
       this.walk(value);
     }
   }
@@ -91,11 +94,13 @@ export class Observer {
 // helpers
 
 //Augment a target Object or Array by intercepting the prototype chain using __proto__
+/*直接覆盖原型的方法来修改目标对象或数组*/
 function protoAugment(target, src: Object) {
   target.__proto__ = src;
 }
 
 // Augment a target Object or Array by defining hidden properties
+/*定义（覆盖）目标对象或数组的某一个方法*/
 function copyAugment(target: Object, src: Object, keys: Array<string>) {
   for (let i = 0, l = keys.length; i < l; i++) {
     const key = keys[i];
@@ -106,7 +111,11 @@ function copyAugment(target: Object, src: Object, keys: Array<string>) {
 // Attempt to create an observer instance for a value,
 // returns the new observer if successfully observed,
 // or the existing observer if the value already has one.
+// 尝试创建一个Observer实例（__ob__）,
+// 如果成功创建Observer实例则返回新的Observer实例，
+// 如果已有Observer实例则返回现有的Observer实例
 export function observe(value: any, asRootData: ?boolean): Observer | void {
+  /*判断是否是一个对象*/
   if (!isObject(value) || value instanceof VNode) {
     return;
   }
@@ -121,9 +130,11 @@ export function observe(value: any, asRootData: ?boolean): Observer | void {
     Object.isExtensible(value) &&
     !value._isVue;
 
-  // Vue的响应式数据都会有一个__ob__的属性作为标记，里面存放了该属性的观察器，也就是Observer的实例，防止重复绑定;
+  // Vue的响应式数据都会有一个__ob__的属性作为标记，里面存放了该属性的观察器，
+  // 也就是Observer的实例，防止重复绑定;
   // 这里用__ob__这个属性来判断是否已经有Observer实例，
-  // 如果没有Observer实例则会新建一个Observer实例并赋值给__ob__这个属性，如果已有Observer实例则直接返回该Observer实例
+  // 如果没有Observer实例则会新建一个Observer实例并赋值给__ob__这个属性，
+  //如果已有Observer实例则直接返回该Observer实例
   if (hasOwn(value, "__ob__") && value.__ob__ instanceof Observer) {
     ob = value.__ob__;
   } else if (status) {
@@ -205,7 +216,7 @@ export function defineReactive(
       } else {
         val = newVal;
       }
-      
+
       childOb = !shallow && observe(newVal);
       dep.notify();
     }
@@ -226,15 +237,18 @@ export function set(target: Array<any> | Object, key: any, val: any): any {
       `Cannot set reactive property on undefined, null, or primitive value: ${(target: any)}`
     );
   }
+
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.length = Math.max(target.length, key);
     target.splice(key, 1, val);
     return val;
   }
+
   if (key in target && !(key in Object.prototype)) {
     target[key] = val;
     return val;
   }
+
   const ob = (target: any).__ob__;
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== "production" &&
@@ -244,10 +258,12 @@ export function set(target: Array<any> | Object, key: any, val: any): any {
       );
     return val;
   }
+
   if (!ob) {
     target[key] = val;
     return val;
   }
+
   defineReactive(ob.value, key, val);
   ob.dep.notify();
   return val;
@@ -265,11 +281,14 @@ export function del(target: Array<any> | Object, key: any) {
       `Cannot delete reactive property on undefined, null, or primitive value: ${(target: any)}`
     );
   }
+
   if (Array.isArray(target) && isValidArrayIndex(key)) {
     target.splice(key, 1);
     return;
   }
+
   const ob = (target: any).__ob__;
+
   if (target._isVue || (ob && ob.vmCount)) {
     process.env.NODE_ENV !== "production" &&
       warn(
@@ -278,6 +297,7 @@ export function del(target: Array<any> | Object, key: any) {
       );
     return;
   }
+
   if (!hasOwn(target, key)) {
     return;
   }

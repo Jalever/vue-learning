@@ -25,7 +25,7 @@ export default class Dep {
     this.subs.push(sub);
   }
 
-  //移除渲染不需要的数据
+  //从subs数组中移除sub;移除渲染不需要的数据
   removeSub(sub: Watcher) {
     //   export function remove (arr: Array<any>, item: any): Array<any> | void {
     //   if (arr.length) {

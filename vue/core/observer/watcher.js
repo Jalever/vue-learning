@@ -130,11 +130,13 @@ export default class Watcher {
     try {
       value = this.getter.call(vm, vm);
     } catch (e) {
+
       if (this.user) {
         handleError(e, vm, `getter for watcher "${this.expression}"`);
       } else {
         throw e;
       }
+      
     } finally {
       // "touch" every property so they are all tracked as
       // dependencies for deep watching
@@ -198,6 +200,8 @@ export default class Watcher {
     } else if (this.sync) {
       this.run();
     } else {
+
+      //没有相同的watcher id就push进watcher数组
       queueWatcher(this);
     }
   }

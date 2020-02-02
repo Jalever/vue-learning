@@ -35,8 +35,13 @@ methodsToPatch.forEach(function(method) {
         inserted = args.slice(2);
         break;
     }
-    
+
     if (inserted) ob.observeArray(inserted);
+    // observeArray(items: Array<any>) {
+    //   for (let i = 0, l = items.length; i < l; i++) {
+    //     observe(items[i]);
+    //   }
+    // }
 
     // notify change
     ob.dep.notify();
