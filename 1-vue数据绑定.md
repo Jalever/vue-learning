@@ -9,8 +9,8 @@
 
 1. 通过 ES 6 中的 Object.defineProperty 修改 Vue 实例中的 data 对象的 data descriptor
 2. 每次修改 data 对象中的数据时就会调用 callback 方法
-3. accesor descriptor( configurable, enumerable, get, set )
-4. data descriptor( configurable, enumerable, value, writable )
+3. accessor descriptor存取描述符( configurable, enumerable, get, set )
+4. data descriptor数据描述符( configurable, enumerable, value, writable )
 
 ```js
 function observe(obj, cb) {
