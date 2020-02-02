@@ -53,6 +53,10 @@ export function initEvents(vm: Component) {
 
 #### \$on
 
+1. \$on(event, fn)
+2. event 是数组, 遍历 event 数组, 监听数组中的 event 事件
+3. event 不是数组, 如果\_events 存在则 push 进去, 如果不存在, 在创建一个新的数组 push 进入
+
 ```js
 Vue.prototype.$on = function(
   event: string | Array<string>,
