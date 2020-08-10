@@ -6,6 +6,7 @@
     - [数据绑定成员是数组](#%e6%95%b0%e6%8d%ae%e7%bb%91%e5%ae%9a%e6%88%90%e5%91%98%e6%98%af%e6%95%b0%e7%bb%84)
 
 ## 响应式原理
+Vue 2的响应式原理依赖于Object.defineProperty, 通过设定对象属性的getter/setter来监听数据的变化，通过getter进行依赖收集，setter进行数据变更时同时也更新视图
 
 1. 通过 ES 6 中的 Object.defineProperty 修改 Vue 实例中的 data 对象的 data descriptor
 2. 每次修改 data 对象中的数据时就会调用 callback 方法

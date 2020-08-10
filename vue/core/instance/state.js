@@ -57,6 +57,7 @@ export function initState(vm: Component) {
   if (opts.data) {
     initData(vm);
   } else {
+    // (value: any, asRootData: ?boolean)
     observe((vm._data = {}), true /* asRootData */);
   }
 
@@ -242,13 +243,27 @@ export function defineComputed(
   key: string,
   userDef: Object | Function
 ) {
+  //非ssr都进行缓存
   const shouldCache = !isServerRendering();
+
+  // computed: {
+  //   xxx() {
+  //     return 
+  //   }
+  // }
   if (typeof userDef === "function") {
     sharedPropertyDefinition.get = shouldCache
       ? createComputedGetter(key)
       : createGetterInvoker(userDef);
     sharedPropertyDefinition.set = noop;
   } else {
+
+  // computed: {
+  //   xxx: {
+  //     get(){},
+  //     set(){}
+  //   }
+  // }
     sharedPropertyDefinition.get = userDef.get
       ? shouldCache && userDef.cache !== false
         ? createComputedGetter(key)
@@ -320,6 +335,14 @@ function initMethods(vm: Component, methods: Object) {
 }
 
 function initWatch(vm: Component, watch: Object) {
+  // watch: {
+  //   xxx1() {},
+  //   "xxx2": {
+  //     deep: true,
+  //     immediate: true,
+  //     handler() {}
+  //   }
+  // }
   for (const key in watch) {
     const handler = watch[key];
     if (Array.isArray(handler)) {
@@ -338,13 +361,20 @@ function createWatcher(
   handler: any,
   options?: Object
 ) {
+  //   "xxx2": {
+  //     deep: true,
+  //     immediate: true,
+  //     handler() {}
+  //   }
   if (isPlainObject(handler)) {
     options = handler;
     handler = handler.handler;
   }
+
   if (typeof handler === "string") {
     handler = vm[handler];
   }
+
   return vm.$watch(expOrFn, handler, options);
 }
 
@@ -360,6 +390,7 @@ export function stateMixin(Vue: Class<Component>) {
   propsDef.get = function() {
     return this._props;
   };
+
   if (process.env.NODE_ENV !== "production") {
     dataDef.set = function() {
       warn(
@@ -372,18 +403,25 @@ export function stateMixin(Vue: Class<Component>) {
       warn(`$props is readonly.`, this);
     };
   }
+
   Object.defineProperty(Vue.prototype, "$data", dataDef);
   Object.defineProperty(Vue.prototype, "$props", propsDef);
 
   Vue.prototype.$set = set;
   Vue.prototype.$delete = del;
 
+  //   "xxx2": {
+  //     deep: true,
+  //     immediate: true,
+  //     handler() {}
+  //   }
   Vue.prototype.$watch = function(
     expOrFn: string | Function,
-    cb: any,
-    options?: Object
+    cb: any, //handler()
+    options?: Object // {deep: true, immediate: true, handler() {...}}
   ): Function {
     const vm: Component = this;
+
     if (isPlainObject(cb)) {
       return createWatcher(vm, expOrFn, cb, options);
     }

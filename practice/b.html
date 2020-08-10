@@ -1,0 +1,19 @@
+<html>
+  <head>
+    <title>b.html</title>
+    <meta charset="utf8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+
+    <script>
+      window.domain = "test.jalever.com";
+      function myFn() {
+        console.log("onload b.html");
+        this.b = "bHtml";
+      }
+    </script>
+  </head>
+
+  <body onload="myFn()">
+    <p>b.html</p>
+  </body>
+</html>

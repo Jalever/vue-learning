@@ -165,6 +165,7 @@ function callActivatedHooks(queue) {
 export function queueWatcher(watcher: Watcher) {
   const id = watcher.id;
 
+  // has = {}
   if (has[id] == null) {
     has[id] = true;
     if (!flushing) {

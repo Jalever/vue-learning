@@ -22,6 +22,7 @@ function _traverse (val: any, seen: SimpleSet) {
   if ((!isA && !isObject(val)) || Object.isFrozen(val) || val instanceof VNode) {
     return
   }
+  
   if (val.__ob__) {
     const depId = val.__ob__.dep.id
     if (seen.has(depId)) {

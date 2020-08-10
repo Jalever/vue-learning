@@ -29,10 +29,24 @@ let uid = 0;
  *  * - teardown
  */
 
+ /** 
+  * watcher 有下面几种使用场景:
+  * render watcher 
+    渲染 watcher，渲染视图用的 watcher
+
+  * computed watcher 
+    计算属性 watcher，因为计算属性即依赖别人也被人依赖，因此也会持有一个 Dep 实例
+  
+  * watch watcher 
+    侦听器 watcher
+ */
+
 /**
  * A watcher parses an expression, collects dependencies,
  * and fires callback when the expression value changes.
  * This is used for both the $watch() api and directives.
+ * 一个解析表达式，进行依赖收集的观察者，同时在表达式数据变更时触发回调函数
+ * 它被用于$watch api以及指令
  */
 export default class Watcher {
   vm: Component;
@@ -58,7 +72,7 @@ export default class Watcher {
     expOrFn: string | Function,
     cb: Function,
     options?: ?Object,
-    isRenderWatcher?: boolean
+    isRenderWatcher?: boolean // 是否是渲染watcher的标志位
   ) {
 
     this.vm = vm;
@@ -94,11 +108,16 @@ export default class Watcher {
 
     // parse expression for getter
     if (typeof expOrFn === "function") {
-
       this.getter = expOrFn;
-
     } else {
-
+      // 例如watch中深度监听的key值：
+      // watch: {
+      //   "111.222.333": {
+      //     deep: true,
+      //     immidiate: true,
+      //     hanlder() {}
+      //   }
+      // }
       this.getter = parsePath(expOrFn);
 
       if (!this.getter) {
@@ -119,10 +138,11 @@ export default class Watcher {
 
   /**
    * Evaluate the getter, and re-collect dependencies.
+   * 获得getter的值并且重新进行依赖收集
    */
   get() {
     // 在这里将观察者本身赋值给全局的target，只有被target标记过的才会进行依赖收集
-    pushTarget(this);
+    pushTarget(this);// 设置Dep.target = this
 
     let value;
     const vm = this.vm;
@@ -144,7 +164,8 @@ export default class Watcher {
         traverse(value);
       }
 
-      popTarget();
+      popTarget();// 将观察者实例从target栈中取出并设置给Dep.target
+
       this.cleanupDeps();
     }
 
@@ -153,6 +174,7 @@ export default class Watcher {
 
   /**
    * Add a dependency to this directive.
+   * 添加一个依赖关系到Deps集合中
    */
   addDep(dep: Dep) {
     const id = dep.id;
@@ -168,6 +190,14 @@ export default class Watcher {
 
   /**
    * Clean up for dependency collection.
+   * 清理newDeps里没有的无用watcher依赖
+   * 这个方法首先遍历watcher中存的 deps，
+   * 移除 newDep 中已经没有的订阅，
+   * 然后 depIds = newDepIds; deps = newDeps ，
+   * 把 newDepIds 和 newDeps 清空。
+   * 每次添加完新的订阅后移除旧的已经不需要的订阅，
+   * 这样在某些情况，
+   * 比如 v-if 已不需要的模板依赖的数据发生变化时就不会通知watcher去 update 了
    */
   cleanupDeps() {
     let i = this.deps.length;
@@ -179,6 +209,7 @@ export default class Watcher {
       }
     }
 
+    // 调用depIds和newDepIds && deps和newDeps 的值，并清空newDepIds和newDeps
     let tmp = this.depIds;
     this.depIds = this.newDepIds;
     this.newDepIds = tmp;
@@ -200,7 +231,6 @@ export default class Watcher {
     } else if (this.sync) {
       this.run();
     } else {
-
       //没有相同的watcher id就push进watcher数组
       queueWatcher(this);
     }
@@ -209,6 +239,7 @@ export default class Watcher {
   /**
    * Scheduler job interface.
    * Will be called by the scheduler.
+   * 调度者工作接口，将被调度者回调
    */
   run() {
     if (this.active) {
@@ -246,6 +277,7 @@ export default class Watcher {
   /**
    * Evaluate the value of the watcher.
    * This only gets called for lazy watchers.
+   * 收集该watcher的所有deps依赖
    */
   evaluate() {
     this.value = this.get();
@@ -254,6 +286,7 @@ export default class Watcher {
 
   /**
    * Depend on all deps collected by this watcher.
+   * 收集该watcher的所有deps依赖，只有计算属性使用
    */
   depend() {
     let i = this.deps.length;
@@ -264,6 +297,7 @@ export default class Watcher {
 
   /**
    * Remove self from all dependencies' subscriber list.
+   * 将自身从所有依赖收集订阅列表删除
    */
   teardown() {
     if (this.active) {

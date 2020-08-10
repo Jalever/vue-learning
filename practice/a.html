@@ -1,0 +1,23 @@
+<html>
+  <head>
+    <title>a.html</title>
+    <meta charset="utf8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  </head>
+
+  <body>
+    <iframe src="http://test.jalever.com" id="frame" onload="load()"> </iframe>
+
+    <script>
+      window.domain = "www.jalever.com";
+      function load() {
+        // iframe.contentDocument || iframe.contentWindow.document
+        let frame = document.getElementById("frame"),
+          doc = frame.contentDocument || frame.contentWindow.document;
+
+        console.log("get b.html content: ");
+        console.log(doc);
+      }
+    </script>
+  </body>
+</html>
