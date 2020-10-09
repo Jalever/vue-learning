@@ -26,6 +26,12 @@ import {
   isReservedAttribute
 } from "../util/index";
 
+
+/** 
+  initState():
+  
+*/
+
 const sharedPropertyDefinition = {
   enumerable: true,
   configurable: true,
@@ -45,6 +51,14 @@ export function proxy(target: Object, sourceKey: string, key: string) {
   Object.defineProperty(target, key, sharedPropertyDefinition);
 }
 
+/**
+  * initState
+   * initProps
+   * initMethods
+   * if() initData else observe()
+   * initComputed
+   * initWatch
+ */
 export function initState(vm: Component) {
   vm._watchers = [];
 
@@ -271,6 +285,7 @@ export function defineComputed(
       : noop;
     sharedPropertyDefinition.set = userDef.set || noop;
   }
+
   if (
     process.env.NODE_ENV !== "production" &&
     sharedPropertyDefinition.set === noop
@@ -282,6 +297,7 @@ export function defineComputed(
       );
     };
   }
+  
   Object.defineProperty(target, key, sharedPropertyDefinition);
 }
 
